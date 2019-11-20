@@ -1,4 +1,4 @@
-import React,{ useState, useEffect } from 'react';
+import React,{ useState, useEffect, useRef } from 'react';
 import { View, Text } from 'react-native';
 import { Camera } from 'expo-camera'
 import * as Permissions from 'expo-permissions';
@@ -7,7 +7,7 @@ import Gallery from './gallery.component';
 import styles from './styles';
 
 const CameraPage = () => {
-    cam = null;
+    const cameraRef = useRef(null);
     const [captures, setCaptures] = useState([]);
     const [flashMode, setFlashMode] = useState(Camera.Constants.FlashMode.off);
     const [capturing, setCapturing] = useState(null);
@@ -17,15 +17,15 @@ const CameraPage = () => {
     handleCaptureIn = () => setCapturing(true);
     handleCaptureOut = () => {
         if (capturing) 
-            cam.stopRecording();
+            cameraRef.current.stopRecording();
     };
     handleShortCapture = async () => {
-        const photoData = await cam.takePictureAsync();
+        const photoData = await cameraRef.current.takePictureAsync();
         setCapturing(false);
         setCaptures([photoData, ...captures]);
     };
     handleLongCapture = async () => {
-        const videoData = await cam.recordAsync();
+        const videoData = await cameraRef.current.recordAsync();
         setCapturing(false);
         setCaptures([videoData, ...captures]);
     };
@@ -54,7 +54,7 @@ const CameraPage = () => {
                 type = {cameraType}
                 flashMode = {flashMode}
                 style = {styles.preview}
-                ref = {camera => cam = camera}
+                ref = {cameraRef}
             />
         </View>
         {captures.length > 0 && <Gallery captures={captures}/>}
